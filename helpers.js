@@ -32,4 +32,12 @@ function hash(buf, fn, hashSize, bigEndian) {
   return toBuffer(arr, hashSize, bigEndian);
 }
 
-module.exports = { hash: hash };
+
+// This hash function is for blake256 since it is a touch pickier.
+function hash2(buf, fn, hashSize, bigEndian) {
+  if (!Buffer.isBuffer(buf)) buf = new Buffer(buf);
+  var arr = fn(buf, buf.length * chrsz);
+  return toBuffer(arr, hashSize, bigEndian);
+}
+
+module.exports = { hash: hash, hash2: hash2 };
