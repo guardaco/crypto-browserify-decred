@@ -1,3 +1,5 @@
+// Add copyright statement from where this came from (licenses are the same).
+
 var helpers = require('./helpers');
 
 /**
