@@ -1,4 +1,6 @@
-// Add copyright statement from where this came from (licenses are the same).
+// This code is largerly taken from crypto-js (c) 2009-2013 by Jeff Mott and
+// release under the MIT license.
+// Modified to fit crypto-browserify by jcv@decred.org 2015
 
 var helpers = require('./helpers');
 
