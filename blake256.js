@@ -675,11 +675,14 @@ C.HMAC_BLAKE256 = C_lib_Hash._createHmacHelper(C_algo_BLAKE256);
 
 // Wrap existing blake function in this.
 function core_blake256(x, len) {
+    //console.log("blake stuff:");
+    //console.log(x);
     var out = C.BLAKE256(x);
     var HASH = out.words;
     return HASH;
 }
 
 module.exports = function blake256(buf) {
-  return helpers.hash(buf, core_blake256, 32);
+    console.log(buf.toString());
+    return helpers.hash2(buf, core_blake256, 32, true);
 };
