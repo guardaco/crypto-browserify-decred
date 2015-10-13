@@ -677,7 +677,7 @@ C.HMAC_BLAKE256 = C_lib_Hash._createHmacHelper(C_algo_BLAKE256);
 
 // Wrap existing blake function in this.
 function core_blake256(x, len) {
-    var out = C.BLAKE256(x);
+    var out = C.BLAKE256(CryptoJS.enc.Hex.fromString(x.toString('hex')));
     var HASH = out.words;
     return HASH;
 }
