@@ -531,7 +531,7 @@ var C_lib_Hash = C_lib.Hash;
 var C_algo = C.algo;
 
 // Constants
-var K = [
+const K = [
     0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344,
     0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89,
     0x452821e6, 0x38d01377, 0xbe5466cf, 0x34e90c6c,
@@ -539,7 +539,7 @@ var K = [
 ];
 
 // Permutations
-var P = [
+const P = [
     [0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15],
     [14, 10, 4,  8,  9,  15, 13, 6,  1,  12, 0,  2,  11, 7,  5,  3 ],
     [11, 8,  12, 0,  5,  2,  15, 13, 10, 14, 3,  6,  7,  1,  9,  4 ],
@@ -551,6 +551,15 @@ var P = [
     [6,  15, 14, 9,  11, 3,  0,  8,  12, 2,  13, 7,  1,  4,  10, 5 ],
     [10, 2,  8,  4,  7,  6,  1,  5,  15, 11, 9, 14,  3,  12, 13, 0 ]
 ];
+
+const H1 = [0x6a09e667,
+        0xbb67ae85,
+        0x3c6ef372,
+        0xa54ff53a,
+        0x510e527f,
+        0x9b05688c,
+        0x1f83d9ab,
+        0x5be0cd19];
 
 /**
  * BLAKE-256 hash algorithm.
@@ -565,14 +574,14 @@ var C_algo_BLAKE256 = C_algo.BLAKE256 = C_lib_Hash.extend({
         var H = this._hash.words;
 
         // Initial values
-        H[0] = 0x6a09e667;
-        H[1] = 0xbb67ae85;
-        H[2] = 0x3c6ef372;
-        H[3] = 0xa54ff53a;
-        H[4] = 0x510e527f;
-        H[5] = 0x9b05688c;
-        H[6] = 0x1f83d9ab;
-        H[7] = 0x5be0cd19;
+        H[0] = H1[0];
+        H[1] = H1[1];
+        H[2] = H1[2];
+        H[3] = H1[3];
+        H[4] = H1[4];
+        H[5] = H1[5];
+        H[6] = H1[6];
+        H[7] = H1[7];
 
         // Counter
         this._t = 0;
