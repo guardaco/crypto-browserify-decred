@@ -245,7 +245,6 @@ var CryptoJS = function () {
          * Initializes a newly created hasher.
          */
         init: function (cfg) {
-		console.log("init");
             this._cfg = this._cfg.extend(cfg);
 
             this.reset();
@@ -255,7 +254,6 @@ var CryptoJS = function () {
          * Resets this hash to its initial state.
          */
         reset: function () {
-	    console.log("reset");
             // Initial values
             var hash = this._hash = C_lib_WordArray.create();
             this._message = C_lib_WordArray.create();
@@ -276,7 +274,6 @@ var CryptoJS = function () {
          * @return {CryptoJS.lib.Hash} This hash instance.
          */
         update: function (messageUpdate) {
-	    console.log("update");
             // Convert string to WordArray, else assume WordArray already
             if (typeof messageUpdate == 'string') {
                 messageUpdate = C_enc_Utf8.fromString(messageUpdate);
@@ -287,32 +284,37 @@ var CryptoJS = function () {
             this._length += messageUpdate.sigBytes;
 
             // Update the hash
-            this._hashBlocks();
+            this._hashBlocks(false);
 
             // Chainable
             return this;
         },
 
 
-				     /* Updates this hash.
-				    *                           */
-           _hashBlocks: function () {
+       /** Updates this hash.
+       *                           */
+       _hashBlocks: function (nulltLast) {
            // Shortcuts
-               var message = this._message;
-               var sigBytes = message.sigBytes;
-               var blockSize = this._blockSize;
-	       var nBlocksReady = Math.floor(sigBytes / (blockSize * 4));
-	                            console.log(sigBytes);                                                          
-	       if (nBlocksReady) {
-                   var nWordsReady = nBlocksReady * blockSize;
-                   for (var offset = 0; offset < nWordsReady; offset += blockSize) {            
-                        this._doHashBlock(0);
-			//message.words = message.words.substr(blockSize);
-                        message.words.splice(0, blockSize);
-			message.sigBytes = sigBytes - nWordsReady * 4;
-                   }
+           var message = this._message;
+           var sigBytes = message.sigBytes;
+           var blockSize = this._blockSize;
+           var nBlocksReady = Math.floor(sigBytes / (blockSize * 4));
+           
+           if (nBlocksReady) {
+               var nWordsReady = nBlocksReady * blockSize;
+               for (var offset = 0; offset < nWordsReady; offset += blockSize) {
+                    // Need to incorporate t value into V of last 
+                    // block processed.
+                    var nullt = false
+                    if (message.words.length == blockSize && nulltLast) {
+                        nullt = true;
+                    }
+                    this._doHashBlock(0, nullt);
+                    message.words.splice(0, blockSize);
+                    message.sigBytes = sigBytes - nWordsReady * 4;
                }
-           },
+           }
+       },
 
         /**
          * Completes this hash computation, then resets this hash to its initial state.
@@ -322,7 +324,6 @@ var CryptoJS = function () {
          * @return {CryptoJS.lib.WordArray} The hash.
          */
         compute: function (messageUpdate) {
-	    console.log("compute");
             // Final message update
             if (messageUpdate) {
                 this.update(messageUpdate);
@@ -530,12 +531,12 @@ var C_lib_Hash = C_lib.Hash;
 var C_algo = C.algo;
 
 // Constants
-    var K = [
-	            608135816, -2052912941, 320440878, 57701188,
-		            -1542899678, 698298832, 137296536, -330404727,
-			            1160258022, 953160567, -1101764913, 887688300,
-				            -1062458953, -914599715, 1065670069, -1253635817
-					        ];
+var K = [
+            608135816, -2052912941, 320440878, 57701188,
+            -1542899678, 698298832, 137296536, -330404727,
+            1160258022, 953160567, -1101764913, 887688300,
+            -1062458953, -914599715, 1065670069, -1253635817
+    ];
 // Permutations
 var P = [
     [0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15],
@@ -550,15 +551,6 @@ var P = [
     [10, 2,  8,  4,  7,  6,  1,  5,  15, 11, 9, 14,  3,  12, 13, 0 ]
 ];
 
-const H1 = [0x6a09e667,
-        0xbb67ae85,
-        0x3c6ef372,
-        0xa54ff53a,
-        0x510e527f,
-        0x9b05688c,
-        0x1f83d9ab,
-        0x5be0cd19];
-
 /**
  * BLAKE-256 hash algorithm.
  */
@@ -568,48 +560,49 @@ var C_algo_BLAKE256 = C_algo.BLAKE256 = C_lib_Hash.extend({
     }),
 
     _doReset: function () {
-	    console.log("doReset");
         // Shortcut
         var H = this._hash.words;
-   // Initial values
-            H[0] = 1779033703;
+
+        // Initial values
+        H[0] = 1779033703;
 	    H[1] = -1150833019;
-            H[2] = 1013904242;
+        H[2] = 1013904242;
 	    H[3] = -1521486534;
 	    H[4] = 1359893119;
 	    H[5] = -1694144372;
-	    H[6] = 52873463;
+	    H[6] = 528734635;
 	    H[7] = 1541459225;
 
         // Counter
         this._t = 0;
     },
 
-    _doHashBlock: function (offset) {
-	    console.log("doHashBlock");
+    _doHashBlock: function (offset, nullt) {
         // Shortcuts
         var message = this._message;
         var M = message.words;
-	console.log("message", this._message.toString());
-        console.log("M", M[0], M[1], M[2], M[3], M[4],M[5], M[6], M[7], M[8], M[9],M[10], M[11], M[12], M[13], M[14],M[15]);
         var H = this._hash.words;
         var S = this._cfg.salt.words;
+        
         // Counter
         var t = this._t += 512;
 
-        console.log("H", H[0], H[1], H[2], H[3], H[4],H[5], H[6], H[7]);
         // State
         var v = [
             H[0], H[1], H[2], H[3],
             H[4], H[5], H[6], H[7],
-            0x243f6a88 ^ S[0], 0x85a308d3 ^ S[1],
-            0x13198a2e ^ S[2], 0x03707344 ^ S[3],
-            0xa4093822 ^ t,    0x299f31d0 ^ t,
-            0x082efa98,        0xec4e6c89
+            608135816 ^ S[0], -2052912941 ^ S[1],
+            320440878 ^ S[2], 57701188 ^ S[3],
+            -1542899678, 698298832,
+            137296536, -330404727
         ];
-	for (var i = 0; i < M.length; i++){
-        if (!M[i]) M[i] = 0x00;
-	}
+        if (!nullt) {
+            v[12] = v[12] ^ t
+            v[13] = v[13] ^ t
+        }
+        for (var i = 0; i < M.length; i++){
+            if (!M[i]) M[i] = 0;
+        }
         // Rounds
         for (var r = 0; r < 14; r++) {
             var rMod10 = r % 10;
@@ -631,10 +624,16 @@ var C_algo_BLAKE256 = C_algo.BLAKE256 = C_lib_Hash.extend({
     },
 
     _doCompute: function () {
-	    console.log("doCompute");
         // Shortcuts
         var message = this._message;
         var M = message.words;
+        
+        // Need to incorporate t value into V of last 
+        // block processed under certain conditions.
+        lenMessage = message.toString().length / 2
+        var nulltLast = false;
+        if (lenMessage == 0) nulltLast = true;
+        if (lenMessage >= 55) nulltLast = true;
 
         var nBitsTotal = this._length * 8;
         var nBitsLeft = message.sigBytes * 8;
@@ -651,9 +650,9 @@ var C_algo_BLAKE256 = C_algo.BLAKE256 = C_lib_Hash.extend({
         M[(((nBitsLeft + 64) >>> 9) << 4) + 13] |= 1;
         M[M.length + 1] = nBitsTotal;
         message.sigBytes = M.length * 4;
-
+        
         // Hash final blocks
-        this._hashBlocks();
+        this._hashBlocks(nulltLast);
     }
 });
 
