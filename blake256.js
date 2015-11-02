@@ -633,7 +633,7 @@ var C_algo_BLAKE256 = C_algo.BLAKE256 = C_lib_Hash.extend({
         lenMessage = message.toString().length / 2
         var nulltLast = false;
         if (lenMessage == 0) nulltLast = true;
-        if (lenMessage >= 55) nulltLast = true;
+        if (lenMessage > 55) nulltLast = true;
 
         var nBitsTotal = this._length * 8;
         var nBitsLeft = message.sigBytes * 8;
