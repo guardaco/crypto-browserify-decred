@@ -2,6 +2,7 @@
 
 A (partial) port of `crypto` to the browser.
 
+This is a fork for Decred.
 
 [![travis](https://secure.travis-ci.org/dominictarr/crypto-browserify.png?branch=master)](https://travis-ci.org/dominictarr/crypto-browserify)
 
