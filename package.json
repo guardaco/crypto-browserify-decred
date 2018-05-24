@@ -1,12 +1,12 @@
 {
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
-  "name": "crypto-browserify",
+  "name": "crypto-browserify-decred",
   "description": "implementation of crypto for the browser",
   "version": "3.11.0",
   "homepage": "https://github.com/crypto-browserify/crypto-browserify",
   "repository": {
     "type": "git",
-    "url": "git://github.com/crypto-browserify/crypto-browserify.git"
+    "url": "git://github.com/oxfn/crypto-browserify-decred.git"
   },
   "scripts": {
     "standard": "standard",
