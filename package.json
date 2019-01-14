@@ -6,7 +6,7 @@
   "homepage": "https://github.com/decred/crypto-browserify",
   "repository": {
     "type": "git",
-    "url": "git://github.com/decred/crypto-browserify.git"
+    "url": "git://github.com/guardaco/crypto-browserify.git"
   },
   "scripts": {
     "test": "node test/node.js"
