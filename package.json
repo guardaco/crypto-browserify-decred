@@ -6,7 +6,7 @@
   "homepage": "https://github.com/crypto-browserify/crypto-browserify",
   "repository": {
     "type": "git",
-    "url": "git://github.com/oxfn/crypto-browserify-decred.git"
+    "url": "git://github.com/guardaco/crypto-browserify-decred.git"
   },
   "scripts": {
     "prepublish": "npm ls && npm test",
